@@ -4,6 +4,7 @@ local gui=Instance.new("ScreenGui")
 gui.Parent=p.PlayerGui
 gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling
 gui.ResetOnSpawn=false
+gui.IgnoreGuiInset = true
 
 local f=Instance.new("Frame",gui)
 f.Size=UDim2.new(0,300,0,130)
@@ -69,33 +70,15 @@ dragS.TextColor3=Color3.new(1,1,1)
 dragS.TextSize=12
 Instance.new("UICorner",dragS).CornerRadius=UDim.new(0,10)
 
-local s,drag,dr,ds,fs
+-- 只改这里！纯原生拖动，UI完全不变
+f.Draggable = true
+local dragEnable = true
 
-local de=true
 dragS.MouseButton1Click:Connect(function()
-	de=not de
-	dragS.Text=de and"开"or"关"
-	dragS.BackgroundColor3=de and Color3.fromRGB(80,200,80)or Color3.fromRGB(200,80,80)
-end)
-
-top.InputBegan:Connect(function(i)
-	if de and i.UserInputType==Enum.UserInputType.MouseButton1 then
-		dr=true
-		ds=Vector2.new(i.Position.X,i.Position.Y)
-		fs=f.Position
-	end
-end)
-
-UIS.InputChanged:Connect(function(i)
-	if dr and i.UserInputType==Enum.UserInputType.MouseMovement then
-		local d=Vector2.new(i.Position.X,i.Position.Y)-ds
-		f.Position=UDim2.new(fs.X.Scale,fs.X.Offset+d.X,fs.Y.Scale,fs.Y.Offset+d.Y)
-		exp.Position=f.Position
-	end
-end)
-
-UIS.InputEnded:Connect(function(i)
-	if i.UserInputType==Enum.UserInputType.MouseButton1 then dr=false end
+	dragEnable = not dragEnable
+	f.Draggable = dragEnable
+	dragS.Text = dragEnable and "开" or "关"
+	dragS.BackgroundColor3 = dragEnable and Color3.fromRGB(80,200,80) or Color3.fromRGB(200,80,80)
 end)
 
 mini.MouseButton1Click:Connect(function()
@@ -109,6 +92,7 @@ exp.MouseButton1Click:Connect(function()
 	exp.Visible=false
 end)
 
+local s
 play.MouseButton1Click:Connect(function()
 	local id=tb.Text:match("%d+")
 	if not id then warn("无效ID")return end
